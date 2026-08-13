@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: schedulecraft-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: schedulecraft
+      POSTGRES_PASSWORD: schedulecraft
+      POSTGRES_DB: schedulecraft
+    ports:
+      - "5433:5432"
+    volumes:
+      - schedulecraft_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U schedulecraft -d schedulecraft"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  schedulecraft_pgdata:

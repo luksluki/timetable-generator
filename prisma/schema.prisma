@@ -1,0 +1,162 @@
+// ScheduleCraft - Prisma schema
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Guru: stores identity, scheduling rules and relations.
+model Teacher {
+  id             String @id @default(uuid())
+  code           Int    @unique
+  name           String
+  /// Primary subject label (display convenience, e.g. "Informatika").
+  subjectName    String?
+  maxHoursPerDay Int    @default(6)
+
+  // --- Special scheduling rules (school provisions) ---
+  /// Whole days this teacher cannot teach at all (0=Mon..4=Fri). e.g. Hilmy: Tue,Fri.
+  blockedDays     Int[]   @default([])
+  /// Day index on which the teacher must start teaching at `forceStartPeriod`.
+  forceStartDay    Int?
+  /// Period index the teacher's first lesson must occupy on `forceStartDay`.
+  forceStartPeriod Int?
+  /// Schedule is locked to predefined slots (e.g. Amanda, code 18).
+  isFixedSchedule Boolean @default(false)
+
+  unavailabilities TeacherUnavailability[]
+  piketDuties      TeacherPiket[]
+  allocations      TeachingAllocation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([code])
+}
+
+/// Granular per-slot unavailability (finer than blockedDays).
+model TeacherUnavailability {
+  id        String @id @default(uuid())
+  teacherId String
+  dayOfWeek Int
+  periodIdx Int
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, dayOfWeek, periodIdx])
+  @@index([teacherId])
+}
+
+/// Piket (duty shift) assignment per day.
+model TeacherPiket {
+  id        String @id @default(uuid())
+  teacherId String
+  dayOfWeek Int
+
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, dayOfWeek])
+  @@index([dayOfWeek])
+}
+
+/// Rombel / class group. Each must total exactly 42 JP/week.
+model ClassGroup {
+  id    String @id @default(uuid())
+  name  String @unique
+  grade Int
+
+  allocations TeachingAllocation[]
+  schedules   ScheduleSlot[]
+
+  createdAt DateTime @default(now())
+
+  @@index([grade])
+}
+
+model Subject {
+  id             String  @id @default(uuid())
+  name           String  @unique
+  code           String  @unique
+  totalJp        Int
+  /// e.g. "3+3", "3+2", "2+2", "3", "2", "1".
+  splitPattern   String
+  isHeavySubject Boolean @default(false)
+  /// Room preference key used for specialised rooms (e.g. "IPA_LAB", "INFORMATIKA_LAB").
+  category       String?
+
+  allocations TeachingAllocation[]
+
+  createdAt DateTime @default(now())
+}
+
+model Room {
+  id       String  @id @default(uuid())
+  name     String  @unique
+  isLab    Boolean @default(false)
+  /// "REGULAR" | "IPA_LAB" | "INFORMATIKA_LAB"
+  roomType String?
+  capacity Int?
+  building String?
+  floor    Int?
+
+  schedules ScheduleSlot[]
+
+  createdAt DateTime @default(now())
+}
+
+/// A teacher teaching a subject to a class group for `weeklyHours` JP/week.
+model TeachingAllocation {
+  id           String @id @default(uuid())
+  teacherId    String
+  classGroupId String
+  subjectId    String
+  weeklyHours  Int
+
+  teacher    Teacher    @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  classGroup ClassGroup @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
+  subject    Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  schedules ScheduleSlot[]
+
+  @@unique([teacherId, classGroupId, subjectId])
+  @@index([classGroupId])
+  @@index([teacherId])
+}
+
+/// A single placed lesson (one period) in the timetable.
+model ScheduleSlot {
+  id           String  @id @default(uuid())
+  allocationId String
+  roomId       String?
+  classGroupId String
+  dayOfWeek    Int
+  periodIdx    Int
+  /// Locked slots cannot be moved by drag-and-drop (fixed schedules).
+  isLocked     Boolean @default(false)
+  /// Groups contiguous multi-JP cells for the same class/day (visual + validation).
+  blockTag     String?
+
+  allocation TeachingAllocation @relation(fields: [allocationId], references: [id], onDelete: Cascade)
+  room       Room?              @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  classGroup ClassGroup         @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([classGroupId, dayOfWeek, periodIdx])
+  @@index([classGroupId])
+  @@index([allocationId])
+  @@index([dayOfWeek, periodIdx])
+}
+
+/// Configurable JP (lesson period) time ranges and break schedule (singleton).
+model ScheduleConfig {
+  id        Int      @id @default(1)
+  /// [{ index, start: "HH:MM", end: "HH:MM" }, ...] ordered by index.
+  periods   Json
+  /// [{ id, afterIndex, start, end, label }, ...]
+  breaks    Json
+  updatedAt DateTime @updatedAt
+}
