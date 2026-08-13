@@ -17,18 +17,18 @@ type SubjectSeed = {
 };
 
 const SUBJECTS: SubjectSeed[] = [
-  { name: "Bahasa Indonesia", code: "BIN", totalJp: 6, splitPattern: "3+3", isHeavy: false, category: null },
-  { name: "Matematika", code: "MAT", totalJp: 5, splitPattern: "3+2", isHeavy: true, category: null },
-  { name: "IPA", code: "IPA", totalJp: 5, splitPattern: "3+2", isHeavy: true, category: "IPA_LAB" },
-  { name: "Bahasa Inggris", code: "BIG", totalJp: 4, splitPattern: "2+2", isHeavy: false, category: null },
-  { name: "IPS", code: "IPS", totalJp: 4, splitPattern: "2+2", isHeavy: false, category: null },
-  { name: "PAI-BP", code: "PAI", totalJp: 3, splitPattern: "3", isHeavy: false, category: null },
-  { name: "Pend. Pancasila", code: "PAN", totalJp: 3, splitPattern: "3", isHeavy: false, category: null },
-  { name: "PJOK", code: "PJK", totalJp: 3, splitPattern: "3", isHeavy: false, category: null },
-  { name: "Informatika", code: "INF", totalJp: 3, splitPattern: "3", isHeavy: false, category: "INFORMATIKA_LAB" },
-  { name: "Seni Budaya", code: "SEN", totalJp: 3, splitPattern: "3", isHeavy: false, category: null },
-  { name: "Bahasa Sunda", code: "SUN", totalJp: 2, splitPattern: "2", isHeavy: false, category: null },
-  { name: "BK", code: "BK", totalJp: 1, splitPattern: "1", isHeavy: false, category: null },
+  { name: "English", code: "ENG", totalJp: 6, splitPattern: "3+3", isHeavy: false, category: null },
+  { name: "Mathematics", code: "MAT", totalJp: 5, splitPattern: "3+2", isHeavy: true, category: null },
+  { name: "Physics", code: "PHY", totalJp: 5, splitPattern: "3+2", isHeavy: true, category: "PHY_LAB" },
+  { name: "Chemistry", code: "CHE", totalJp: 4, splitPattern: "2+2", isHeavy: false, category: null },
+  { name: "Biology", code: "BIO", totalJp: 4, splitPattern: "2+2", isHeavy: false, category: null },
+  { name: "History", code: "HIS", totalJp: 3, splitPattern: "3", isHeavy: false, category: null },
+  { name: "Geography", code: "GEO", totalJp: 3, splitPattern: "3", isHeavy: false, category: null },
+  { name: "Physical Education", code: "PE", totalJp: 3, splitPattern: "3", isHeavy: false, category: null },
+  { name: "Computer Science", code: "CS", totalJp: 3, splitPattern: "3", isHeavy: false, category: "CS_LAB" },
+  { name: "Art", code: "ART", totalJp: 3, splitPattern: "3", isHeavy: false, category: null },
+  { name: "Music", code: "MUS", totalJp: 2, splitPattern: "2", isHeavy: false, category: null },
+  { name: "Ethics", code: "ETH", totalJp: 1, splitPattern: "1", isHeavy: false, category: null },
 ];
 
 const ALL_CLASSES = ["7A", "7B", "7C", "7D", "7E", "8A", "8B", "8C", "8D", "9A", "9B"];
@@ -45,25 +45,25 @@ type TeacherSeed = {
 };
 
 const TEACHERS: TeacherSeed[] = [
-  { code: 2, name: "Tintin, S.Pd., M.A.", subjectKey: "BIG", classes: ["7A", "7B", "7C", "7D", "7E", "8A"] },
-  { code: 3, name: "Siti Hanifah Juangsih, S.Pd.", subjectKey: "INF", classes: ALL_CLASSES },
-  { code: 4, name: "Abdullah Arifin, S.Pd.", subjectKey: "PAI", classes: ALL_CLASSES },
-  { code: 5, name: "Rita Nurbaini, S.Pd.", subjectKey: "PAN", classes: ALL_CLASSES },
-  { code: 6, name: "Sidik Permana, S.Pd.", subjectKey: "PJK", classes: ALL_CLASSES },
-  { code: 7, name: "Sri Suryani, S.Pd.", subjectKey: "BIN", classes: ["7A", "7B", "7C", "7D", "9A", "9B"] },
-  { code: 8, name: "Widhia Amalia Suhara, S.Pd.", subjectKey: "SEN", classes: ALL_CLASSES },
-  { code: 9, name: "Yeni Supriatini, S.Pd.", subjectKey: "BIN", classes: ["7E", "8A", "8B", "8C", "8D"] },
-  { code: 10, name: "Rike Risdianti, S.Pd.", subjectKey: "IPS", classes: ["7A", "7B", "7C", "7D", "7E", "9A", "9B"] },
-  { code: 11, name: "Indah Putri Fitriani, S.Pd.", subjectKey: "IPA", classes: ["7A", "7B", "7C", "7D", "7E"] },
-  { code: 12, name: "Syifa Aliifah, S.Pd.", subjectKey: "MAT", classes: ["7A", "7B", "7C", "7D", "9A", "9B"] },
-  { code: 13, name: "Huda Triana, S.Pd.", subjectKey: "IPA", classes: ["8A", "8B", "8C", "8D", "9A", "9B"] },
-  { code: 14, name: "Nanik Nur Hasanah, S.Pd.", subjectKey: "MAT", classes: ["7E", "8A", "8B", "8C", "8D"] },
-  { code: 15, name: "Fitri Gustiani Permana, S.Pd.", subjectKey: "BIG", classes: ["8B", "8C", "8D", "9A", "9B"] },
-  { code: 16, name: "Akti Alis Swasty, S.Sos.", subjectKey: "BK", classes: ALL_CLASSES },
+  { code: 2, name: "Alice Johnson", subjectKey: "CHE", classes: ["7A", "7B", "7C", "7D", "7E", "8A"] },
+  { code: 3, name: "Bob Smith", subjectKey: "CS", classes: ALL_CLASSES },
+  { code: 4, name: "Charlie Brown", subjectKey: "HIS", classes: ALL_CLASSES },
+  { code: 5, name: "Diana Prince", subjectKey: "GEO", classes: ALL_CLASSES },
+  { code: 6, name: "Ethan Hunt", subjectKey: "PE", classes: ALL_CLASSES },
+  { code: 7, name: "Fiona Gallagher", subjectKey: "ENG", classes: ["7A", "7B", "7C", "7D", "9A", "9B"] },
+  { code: 8, name: "George Miller", subjectKey: "ART", classes: ALL_CLASSES },
+  { code: 9, name: "Hannah Abbott", subjectKey: "ENG", classes: ["7E", "8A", "8B", "8C", "8D"] },
+  { code: 10, name: "Ian Malcolm", subjectKey: "BIO", classes: ["7A", "7B", "7C", "7D", "7E", "9A", "9B"] },
+  { code: 11, name: "Jane Doe", subjectKey: "PHY", classes: ["7A", "7B", "7C", "7D", "7E"] },
+  { code: 12, name: "Kevin Hart", subjectKey: "MAT", classes: ["7A", "7B", "7C", "7D", "9A", "9B"] },
+  { code: 13, name: "Laura Croft", subjectKey: "PHY", classes: ["8A", "8B", "8C", "8D", "9A", "9B"] },
+  { code: 14, name: "Michael Scott", subjectKey: "MAT", classes: ["7E", "8A", "8B", "8C", "8D"] },
+  { code: 15, name: "Nancy Drew", subjectKey: "CHE", classes: ["8B", "8C", "8D", "9A", "9B"] },
+  { code: 16, name: "Oliver Twist", subjectKey: "ETH", classes: ALL_CLASSES },
   {
     code: 17,
-    name: "Hilmy Salman Abdillah, S.Pd.",
-    subjectKey: "SUN",
+    name: "Pam Beesly",
+    subjectKey: "MUS",
     classes: ALL_CLASSES,
     blockedDays: [1, 4], // Tuesday & Friday blocked
     forceStartDay: 3, // Thursday
@@ -71,8 +71,8 @@ const TEACHERS: TeacherSeed[] = [
   },
   {
     code: 18,
-    name: "Amanda Oktriana, S.E.",
-    subjectKey: "IPS",
+    name: "Quinn Fabray",
+    subjectKey: "BIO",
     classes: ["8A", "8B", "8C", "8D"],
     isFixedSchedule: true, // locked schedule
   },
@@ -80,11 +80,11 @@ const TEACHERS: TeacherSeed[] = [
 
 /** Teacher duty roster (Piket). dayOfWeek: 0=Mon .. 4=Fri */
 const PIKET: Record<number, number[]> = {
-  0: [11, 6, 7], // Monday:  Indah Putri Fitriani, Sidik Permana, Sri Suryani
-  1: [4, 5, 9], // Tuesday: Abdullah Arifin, Rita Nurbaini, Yeni Supriatini
-  2: [14, 2, 8], // Wednesday: Nanik Nur Hasanah, Tintin, Widhia Amalia Suhara
-  3: [16, 15, 3], // Thursday: Akti Alis Swasty, Fitri Gustiani Permana, Siti Hanifah Juangsih
-  4: [13, 10, 12], // Friday: Huda Triana, Rike Risdianti, Syifa Aliifah
+  0: [11, 6, 7], // Monday: Jane Doe, Ethan Hunt, Fiona Gallagher
+  1: [4, 5, 9], // Tuesday: Charlie Brown, Diana Prince, Hannah Abbott
+  2: [14, 2, 8], // Wednesday: Michael Scott, Alice Johnson, George Miller
+  3: [16, 15, 3], // Thursday: Oliver Twist, Nancy Drew, Bob Smith
+  4: [13, 10, 12], // Friday: Laura Croft, Ian Malcolm, Kevin Hart
 };
 
 async function main() {
@@ -120,10 +120,10 @@ async function main() {
 
   console.log("🚪 Seeding rooms...");
   const rooms = [
-    ...ALL_CLASSES.map((name) => ({ name: `Ruang ${name}`, isLab: false, roomType: "REGULAR" as const })),
-    { name: "Lab IPA", isLab: true, roomType: "IPA_LAB" as const },
-    { name: "Lab IPA 2", isLab: true, roomType: "IPA_LAB" as const },
-    { name: "Lab Informatika", isLab: true, roomType: "INFORMATIKA_LAB" as const },
+    ...ALL_CLASSES.map((name) => ({ name: `Room ${name}`, isLab: false, roomType: "REGULAR" as const })),
+    { name: "Physics Lab 1", isLab: true, roomType: "PHY_LAB" as const },
+    { name: "Physics Lab 2", isLab: true, roomType: "PHY_LAB" as const },
+    { name: "Computer Lab", isLab: true, roomType: "CS_LAB" as const },
   ];
   await prisma.room.createMany({ data: rooms });
 
