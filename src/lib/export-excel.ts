@@ -5,8 +5,7 @@ import {
   PERIODS_PER_DAY,
   DAY_NAMES_ID,
 } from "@/lib/schedule-config";
-
-const FILENAME = "Jadwal KBM Semester Ganjil - TP 2026-2027 (FIX).xlsx";
+import type { ScheduleConfigData } from "@/lib/schedule-time";
 
 function classMatrix(slots: SlotView[]) {
   const m: (string | null)[][] = Array.from({ length: PERIODS_PER_DAY }, () =>
@@ -31,16 +30,18 @@ function buildSheet(titleRows: string[], header: string[], rows: (string | numbe
 }
 
 /** Build and download the Excel workbook matching the school's matrix format. */
-export function exportScheduleToExcel(data: ScheduleData) {
+export function exportScheduleToExcel(data: ScheduleData, config: ScheduleConfigData) {
   const wb = XLSX.utils.book_new();
   const header = ["JP", ...DAY_NAMES_ID];
+  const semesterStr = config.semester.toUpperCase();
+  const filename = `Jadwal KBM Semester ${config.semester} - TP ${config.academicYear} (FIX).xlsx`;
 
   // One sheet per class group
   for (const cls of data.classes) {
     const slots = data.slots.filter((s) => s.classGroupId === cls.id);
     const rows = classMatrix(slots).map((r, i) => [i + 1, ...r]);
     const ws = buildSheet(
-      ["JADWAL KBM SEMESTER GANJIL", `TP 2026-2027 — KELAS ${cls.name}`],
+      [`JADWAL KBM SEMESTER ${semesterStr}`, `TP ${config.academicYear} — KELAS ${cls.name}`],
       header,
       rows,
     );
@@ -61,7 +62,7 @@ export function exportScheduleToExcel(data: ScheduleData) {
   tws["!cols"] = [{ wch: 8 }, { wch: 36 }, { wch: 18 }, { wch: 12 }];
   XLSX.utils.book_append_sheet(wb, tws, "Rekap Guru");
 
-  XLSX.writeFile(wb, FILENAME);
+  XLSX.writeFile(wb, filename);
 }
 
 const FORBIDDEN = /[\\/?*[\]:]/g;

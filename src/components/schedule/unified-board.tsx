@@ -1,14 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, Info } from "lucide-react";
+import Link from "next/link";
+import { Download, Info, Printer } from "lucide-react";
 import { toast } from "sonner";
 import type { ScheduleData, SlotView } from "@/lib/schedule-data";
 import type { ScheduleConfigData } from "@/lib/schedule-time";
 import { buildTimeline } from "@/lib/schedule-time";
 import { DAYS_PER_WEEK } from "@/lib/schedule-config";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { exportScheduleToExcel } from "@/lib/export-excel";
 import { useT } from "@/components/i18n/locale-provider";
@@ -77,12 +78,15 @@ export function UnifiedTimetableBoard({
           <Button variant="outline" onClick={() => setLegendOpen((v) => !v)}>
             <Info className="mr-2 h-4 w-4" /> {s("unified.legend")}
           </Button>
+          <Link href="/timetable/print" className={buttonVariants({ variant: "outline" })}>
+            <Printer className="mr-2 h-4 w-4" /> {s("unified.print")}
+          </Link>
           <Button
             variant="outline"
             disabled={!hasSlots}
             onClick={() => {
               try {
-                exportScheduleToExcel(data);
+                exportScheduleToExcel(data, config);
               } catch (e) {
                 toast.error(s("schedule.toastExportFailed"), { description: (e as Error).message });
               }

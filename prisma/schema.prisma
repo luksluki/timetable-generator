@@ -158,5 +158,7 @@ model ScheduleConfig {
   periods   Json
   /// [{ id, afterIndex, start, end, label }, ...]
   breaks    Json
+  academicYear String @default("2026-2027")
+  semester     String @default("Ganjil")
   updatedAt DateTime @updatedAt
 }

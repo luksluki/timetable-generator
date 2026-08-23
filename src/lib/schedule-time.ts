@@ -8,7 +8,12 @@ export type BreakDef = {
   end: string;
   label: string;
 };
-export type ScheduleConfigData = { periods: PeriodDef[]; breaks: BreakDef[] };
+export type ScheduleConfigData = {
+  periods: PeriodDef[];
+  breaks: BreakDef[];
+  academicYear: string;
+  semester: string;
+};
 
 export type TimelineEntry =
   | { kind: "period"; period: PeriodDef }
@@ -35,6 +40,8 @@ export function defaultConfig(): ScheduleConfigData {
   return {
     periods: DEFAULT_PERIODS.map((p) => ({ ...p })),
     breaks: DEFAULT_BREAKS.map((b) => ({ ...b })),
+    academicYear: "2026-2027",
+    semester: "Ganjil",
   };
 }
 
@@ -63,6 +70,8 @@ function asBreak(b: Record<string, unknown>): BreakDef | null {
 export function normalizeConfig(
   periodsRaw: unknown,
   breaksRaw: unknown,
+  academicYearRaw?: unknown,
+  semesterRaw?: unknown,
 ): ScheduleConfigData {
   const periods = (Array.isArray(periodsRaw) ? periodsRaw : [])
     .map((p) => asPeriod(p as Record<string, unknown>))
@@ -71,7 +80,9 @@ export function normalizeConfig(
   const breaks = (Array.isArray(breaksRaw) ? breaksRaw : [])
     .map((b) => asBreak(b as Record<string, unknown>))
     .filter((b): b is BreakDef => b !== null);
-  return { periods, breaks };
+  const academicYear = typeof academicYearRaw === "string" && academicYearRaw.trim() ? academicYearRaw.trim() : "2026-2027";
+  const semester = typeof semesterRaw === "string" && semesterRaw.trim() ? semesterRaw.trim() : "Ganjil";
+  return { periods, breaks, academicYear, semester };
 }
 
 /** Merge periods + breaks into an ordered day timeline. */

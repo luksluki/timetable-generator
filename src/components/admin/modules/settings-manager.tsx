@@ -88,6 +88,8 @@ export function SettingsManager({ initial }: Props) {
       const res = await saveScheduleConfig({
         periods: config.periods,
         breaks: config.breaks,
+        academicYear: config.academicYear,
+        semester: config.semester,
       });
       if (res.ok) {
         toast.success(String(t("common.saved")));
@@ -127,6 +129,37 @@ export function SettingsManager({ initial }: Props) {
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
+        {/* General Settings */}
+        <div className="rounded-md border lg:col-span-2">
+          <div className="border-b px-3 py-2 text-sm font-semibold">{s("admin.settings.general")}</div>
+          <div className="flex flex-wrap gap-4 p-4">
+            <div className="space-y-1.5">
+              <Label>{s("admin.settings.academicYear")}</Label>
+              <Input
+                className="w-[200px]"
+                value={config.academicYear}
+                onChange={(e) => setConfig((c) => ({ ...c, academicYear: e.target.value }))}
+                placeholder="2026-2027"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{s("admin.settings.semester")}</Label>
+              <Select
+                value={config.semester}
+                onValueChange={(v) => setConfig((c) => ({ ...c, semester: v || "Ganjil" }))}
+              >
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Ganjil">Ganjil (Odd)</SelectItem>
+                  <SelectItem value="Genap">Genap (Even)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
         {/* JP time periods */}
         <div className="rounded-md border">
           <div className="flex items-center justify-between border-b px-3 py-2">

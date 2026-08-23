@@ -164,7 +164,7 @@ export function ScheduleBoard({ initialData, config }: Props) {
 
   function handleExport() {
     try {
-      exportScheduleToExcel(data);
+      exportScheduleToExcel(data, config);
       toast.success(s("schedule.toastExported"));
     } catch (e) {
       toast.error(s("schedule.toastExportFailed"), { description: (e as Error).message });

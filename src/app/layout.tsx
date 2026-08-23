@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { CalendarRange } from "lucide-react";
@@ -9,6 +10,7 @@ import {
   LocaleProvider,
   LocaleSwitcher,
 } from "@/components/i18n/locale-provider";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const geistSans = Geist({ variable: "--font-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"] });
@@ -30,8 +32,10 @@ export default async function RootLayout({
     <html
       lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <LocaleProvider initialLocale={locale}>
           <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur print:hidden">
             <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4">
@@ -55,7 +59,8 @@ export default async function RootLayout({
                   {ts("nav.admin")}
                 </Link>
               </nav>
-              <div className="ml-auto">
+              <div className="ml-auto flex items-center gap-1">
+                <ThemeToggle />
                 <LocaleSwitcher />
               </div>
             </div>
@@ -63,6 +68,7 @@ export default async function RootLayout({
           <main className="flex-1">{children}</main>
           <Toaster richColors position="top-right" />
         </LocaleProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
