@@ -9,7 +9,17 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
+let isGenerating = false;
+
 export async function POST(request: Request) {
+  if (isGenerating) {
+    return NextResponse.json(
+      { ok: false, status: "ERROR", message: "A timetable generation is currently in progress. Please wait." },
+      { status: 429 },
+    );
+  }
+  isGenerating = true;
+  
   let timeoutSeconds = 30;
   let piketRule: "capOver30" | "blockUnder33" = "capOver30";
   try {
@@ -57,6 +67,8 @@ export async function POST(request: Request) {
       { ok: false, status: "ERROR", message },
       { status: 500 },
     );
+  } finally {
+    isGenerating = false;
   }
 }
 
@@ -72,8 +84,10 @@ async function persistSlots(slots: SolverSlot[]) {
     blockTag: s.blockTag ?? null,
   }));
 
-  await prisma.$transaction([
-    prisma.scheduleSlot.deleteMany(),
-    prisma.scheduleSlot.createMany({ data: rows }),
-  ]);
+  await prisma.$transaction(async (tx) => {
+    // Acquire a transaction-level advisory lock to prevent concurrent timetable replacement race conditions
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(20240824)`;
+    await tx.scheduleSlot.deleteMany();
+    await tx.scheduleSlot.createMany({ data: rows });
+  });
 }

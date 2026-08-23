@@ -102,6 +102,13 @@ export function ScheduleBoard({ initialData, config }: Props) {
         body: JSON.stringify({ timeoutSeconds: timeout, piketRule }),
         signal: controller.signal,
       });
+      
+      if (res.status === 429) {
+        const errJson = await res.json().catch(() => ({ message: "Generation in progress by another user." }));
+        toast.error("Generation blocked", { description: errJson.message });
+        return;
+      }
+      
       const json = (await res.json()) as {
         ok: boolean;
         status?: string;
