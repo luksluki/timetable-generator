@@ -162,3 +162,12 @@ model ScheduleConfig {
   semester     String @default("Ganjil")
   updatedAt DateTime @updatedAt
 }
+
+/// A snapshot of a generated timetable for version history.
+model TimetableSnapshot {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  /// JSON array of ScheduleSlot objects
+  slotsData Json
+}

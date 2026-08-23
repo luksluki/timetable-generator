@@ -27,7 +27,10 @@ drag-and-drop grid, Excel export and print support.
 - **Interactive grid** (`/schedule`) with three views — **By Class**, **By
   Teacher**, **By Room** — and `@hello-pangea/dnd` drag-and-drop with live
   conflict highlighting (🔴 hard / 🟡 soft).
-- **Export** to the school's Excel matrix format and a print-friendly PDF view.
+- **Export** to the school's Excel matrix format and a print-friendly PDF view (native browser print).
+- **Timetable Version History (Snapshots)** to save, restore, and manage previous timetable states.
+- **Configurable Settings** for Academic Year, Semester, and daily lesson time frames.
+- **Dark Mode** toggle integrated across all interfaces.
 
 ## Management UI (`/admin`)
 

@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ScheduleGrid, type ViewMode } from "@/components/schedule/schedule-grid";
+import { SnapshotManager } from "@/components/schedule/snapshot-manager";
 import { useT } from "@/components/i18n/locale-provider";
 
 type Props = { initialData: ScheduleData; config: ScheduleConfigData };
@@ -200,6 +201,7 @@ export function ScheduleBoard({ initialData, config }: Props) {
             {generating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
             {generating ? s("schedule.generating") : s("schedule.generate")}
           </Button>
+          <SnapshotManager onRestored={(fresh) => setData(fresh)} disabled={generating} />
           <Button variant="outline" onClick={handleExport} disabled={!hasSlots}>
             <Download className="mr-2 h-4 w-4" /> {s("schedule.excel")}
           </Button>
