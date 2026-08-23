@@ -10,6 +10,7 @@ import {
   ClipboardList,
   LayoutDashboard,
   Clock,
+  Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/i18n/locale-provider";
@@ -22,6 +23,7 @@ const NAV = [
   { href: "/admin/allocations", labelKey: "admin.sidebar.allocations", icon: CalendarRange },
   { href: "/admin/piket", labelKey: "admin.sidebar.piket", icon: ClipboardList },
   { href: "/admin/settings", labelKey: "admin.sidebar.settings", icon: Clock },
+  { href: "/admin/import", labelKey: "admin.sidebar.import", icon: Database },
 ];
 
 export function AdminSidebar() {
