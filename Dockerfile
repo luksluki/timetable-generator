@@ -1,7 +1,8 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 
-# Install Python 3 and pip
-RUN apk add --no-cache python3 py3-pip
+# Install Python 3, pip, and ortools
+RUN apt-get update && apt-get install -y python3 python3-pip && rm -rf /var/lib/apt/lists/*
+RUN pip3 install ortools --break-system-packages
 
 # Install dependencies
 FROM base AS deps
