@@ -87,13 +87,25 @@ export async function runSolver(
 
   try {
     const { code } = await finished;
+    const trimmed = stdout.trim();
+
     if (code !== 0) {
+      if (trimmed.startsWith("{")) {
+        try {
+          const parsed = JSON.parse(trimmed) as SolverResult;
+          if (parsed.status === "ERROR") {
+            return parsed;
+          }
+        } catch {
+          // ignore parse error, fall through to throwing generic error
+        }
+      }
       throw new Error(
         stderr.trim() ||
           `Solver process exited with code ${code} (python binary: ${bin}).`,
       );
     }
-    const trimmed = stdout.trim();
+
     if (!trimmed) {
       throw new Error("Solver produced no output.");
     }
