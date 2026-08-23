@@ -1,0 +1,41 @@
+# Dependencies (reinstalled via npm ci)
+node_modules
+.pnp
+.pnp.*
+.yarn
+
+# Build artifacts
+.next
+out
+build
+
+# Version control
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+
+# IDE & OS
+.vscode
+.idea
+*.swp
+.DS_Store
+
+# TypeScript build cache
+*.tsbuildinfo
+next-env.d.ts
+
+# Generated code (regenerated in builder stage)
+src/generated
+
+# Dev tooling
+coverage
+.vercel
+
+# Documentation
+README.md
+prd.md
+AGENTS.md
+CLAUDE.md
