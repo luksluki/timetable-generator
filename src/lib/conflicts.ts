@@ -57,22 +57,29 @@ export function blockCells(slots: SlotView[], slot: SlotView): SlotView[] {
 export function detectConflicts(slots: SlotView[]): Conflict[] {
   const conflicts: Conflict[] = [];
 
-  // Bounds & locked + heavy morning
+  const teacherGrid = new Map<string, SlotView[][]>();
+  const classGrid = new Map<string, SlotView[][]>();
+  const roomGrid = new Map<string, SlotView[][]>();
+  const blockGrid = new Map<string, SlotView[][]>();
+  const teacherDay = new Map<string, SlotView[][]>();
+
+  const gridSize = DAYS_PER_WEEK * PERIODS_PER_DAY;
+
   for (const s of slots) {
-    if (
-      s.dayOfWeek < 0 ||
-      s.dayOfWeek >= DAYS_PER_WEEK ||
-      s.periodIdx < 0 ||
-      s.periodIdx >= PERIODS_PER_DAY
-    ) {
+    const d = s.dayOfWeek;
+    const p = s.periodIdx;
+
+    if (d < 0 || d >= DAYS_PER_WEEK || p < 0 || p >= PERIODS_PER_DAY) {
       conflicts.push({
         kind: "bounds",
         level: "hard",
         slotIds: [s.id],
         message: "Slot is outside the valid day/period grid.",
       });
+      continue;
     }
-    if (s.isHeavy && !MORNING_PERIOD_INDICES.includes(s.periodIdx)) {
+
+    if (s.isHeavy && !MORNING_PERIOD_INDICES.includes(p)) {
       conflicts.push({
         kind: "heavyMorning",
         level: "soft",
@@ -80,129 +87,102 @@ export function detectConflicts(slots: SlotView[]): Conflict[] {
         message: `${s.subjectName} (heavy) is not in a morning period.`,
       });
     }
+
+    const gridIdx = d * PERIODS_PER_DAY + p;
+
+    let tArr = teacherGrid.get(s.teacherId);
+    if (!tArr) { tArr = Array.from({ length: gridSize }, () => []); teacherGrid.set(s.teacherId, tArr); }
+    tArr[gridIdx].push(s);
+
+    let cArr = classGrid.get(s.classGroupId);
+    if (!cArr) { cArr = Array.from({ length: gridSize }, () => []); classGrid.set(s.classGroupId, cArr); }
+    cArr[gridIdx].push(s);
+
+    if (s.roomId) {
+      let rArr = roomGrid.get(s.roomId);
+      if (!rArr) { rArr = Array.from({ length: gridSize }, () => []); roomGrid.set(s.roomId, rArr); }
+      rArr[gridIdx].push(s);
+    }
+
+    let bArr = blockGrid.get(s.allocationId);
+    if (!bArr) { bArr = Array.from({ length: DAYS_PER_WEEK }, () => []); blockGrid.set(s.allocationId, bArr); }
+    bArr[d].push(s);
+
+    let tdArr = teacherDay.get(s.teacherId);
+    if (!tdArr) { tdArr = Array.from({ length: DAYS_PER_WEEK }, () => []); teacherDay.set(s.teacherId, tdArr); }
+    tdArr[d].push(s);
   }
 
-  const byKey = (keyFn: (s: SlotView) => string | null) => {
-    const m = new Map<string, SlotView[]>();
-    for (const s of slots) {
-      const k = keyFn(s);
-      if (k === null) continue;
-      (m.get(k) ?? m.set(k, []).get(k)!).push(s);
-    }
-    return m;
-  };
-
-  // Teacher double-booking
-  for (const [, group] of byKey(
-    (s) => `${s.teacherId}|${s.dayOfWeek}|${s.periodIdx}`,
-  )) {
-    if (group.length > 1) {
-      conflicts.push({
-        kind: "teacher",
-        level: "hard",
-        slotIds: group.map((s) => s.id),
-        message: `Teacher ${group[0].teacherCode} is double-booked.`,
-      });
-    }
-  }
-  // Class double-booking
-  for (const [, group] of byKey(
-    (s) => `${s.classGroupId}|${s.dayOfWeek}|${s.periodIdx}`,
-  )) {
-    if (group.length > 1) {
-      conflicts.push({
-        kind: "class",
-        level: "hard",
-        slotIds: group.map((s) => s.id),
-        message: `Class ${group[0].classGroupName} is double-booked.`,
-      });
-    }
-  }
-  // Room double-booking
-  for (const [, group] of byKey(
-    (s) => (s.roomId ? `${s.roomId}|${s.dayOfWeek}|${s.periodIdx}` : null),
-  )) {
-    if (group.length > 1) {
-      conflicts.push({
-        kind: "room",
-        level: "hard",
-        slotIds: group.map((s) => s.id),
-        message: `Room ${group[0].roomName} is double-booked.`,
-      });
-    }
-  }
-
-  // Block contiguity: same allocation+day must occupy consecutive periods.
-  const blockMap = new Map<string, SlotView[]>();
-  for (const s of slots) {
-    const k = `${s.allocationId}|${s.dayOfWeek}`;
-    (blockMap.get(k) ?? blockMap.set(k, []).get(k)!).push(s);
-  }
-  for (const [, group] of blockMap) {
-    if (group.length <= 1) continue;
-    const periods = group.map((s) => s.periodIdx).sort((a, b) => a - b);
-    let contiguous = true;
-    for (let i = 1; i < periods.length; i++) {
-      if (periods[i] !== periods[i - 1] + 1) {
-        contiguous = false;
-        break;
+  for (const grid of teacherGrid.values()) {
+    for (let i = 0; i < gridSize; i++) {
+      if (grid[i].length > 1) {
+        conflicts.push({ kind: "teacher", level: "hard", slotIds: grid[i].map(s => s.id), message: `Teacher ${grid[i][0].teacherCode} is double-booked.` });
       }
     }
-    if (!contiguous) {
-      conflicts.push({
-        kind: "contiguity",
-        level: "hard",
-        slotIds: group.map((s) => s.id),
-        message: `${group[0].subjectName} block is not contiguous.`,
-      });
+  }
+
+  for (const grid of classGrid.values()) {
+    for (let i = 0; i < gridSize; i++) {
+      if (grid[i].length > 1) {
+        conflicts.push({ kind: "class", level: "hard", slotIds: grid[i].map(s => s.id), message: `Class ${grid[i][0].classGroupName} is double-booked.` });
+      }
     }
   }
 
-  // Per-teacher soft checks: gaps + consecutive teaching.
-  const teacherDay = new Map<string, SlotView[]>();
-  for (const s of slots) {
-    const k = `${s.teacherId}|${s.dayOfWeek}`;
-    (teacherDay.get(k) ?? teacherDay.set(k, []).get(k)!).push(s);
-  }
-  for (const [, group] of teacherDay) {
-    const byPeriod = [...group].sort((a, b) => a.periodIdx - b.periodIdx);
-    const periods = byPeriod.map((s) => s.periodIdx);
-    // gaps (holes between first and last)
-    const present = new Set(periods);
-    for (let p = periods[0] + 1; p < periods[periods.length - 1]; p++) {
-      if (!present.has(p)) {
-        conflicts.push({
-          kind: "gap",
-          level: "soft",
-          slotIds: [],
-          message: `Teacher ${group[0].teacherCode} has a free gap on this day.`,
-        });
-        break;
+  for (const grid of roomGrid.values()) {
+    for (let i = 0; i < gridSize; i++) {
+      if (grid[i].length > 1) {
+        conflicts.push({ kind: "room", level: "hard", slotIds: grid[i].map(s => s.id), message: `Room ${grid[i][0].roomName} is double-booked.` });
       }
     }
-    // consecutive runs > MAX
-    let run = 1;
-    for (let i = 1; i < periods.length; i++) {
-      if (periods[i] === periods[i - 1] + 1) run++;
-      else {
-        if (run > MAX_CONSECUTIVE_TEACHING) {
-          conflicts.push({
-            kind: "consecutive",
-            level: "soft",
-            slotIds: byPeriod.slice(i - run, i).map((s) => s.id),
-            message: `Teacher ${group[0].teacherCode} teaches ${run} consecutive periods.`,
-          });
+  }
+
+  for (const grid of blockGrid.values()) {
+    for (let d = 0; d < DAYS_PER_WEEK; d++) {
+      const group = grid[d];
+      if (group.length <= 1) continue;
+      const periods = group.map(s => s.periodIdx).sort((a, b) => a - b);
+      let contiguous = true;
+      for (let i = 1; i < periods.length; i++) {
+        if (periods[i] !== periods[i - 1] + 1) {
+          contiguous = false;
+          break;
         }
-        run = 1;
+      }
+      if (!contiguous) {
+        conflicts.push({ kind: "contiguity", level: "hard", slotIds: group.map(s => s.id), message: `${group[0].subjectName} block is not contiguous.` });
       }
     }
-    if (run > MAX_CONSECUTIVE_TEACHING) {
-      conflicts.push({
-        kind: "consecutive",
-        level: "soft",
-        slotIds: byPeriod.slice(periods.length - run).map((s) => s.id),
-        message: `Teacher ${group[0].teacherCode} teaches ${run} consecutive periods.`,
-      });
+  }
+
+  for (const grid of teacherDay.values()) {
+    for (let d = 0; d < DAYS_PER_WEEK; d++) {
+      const group = grid[d];
+      if (group.length === 0) continue;
+      const byPeriod = [...group].sort((a, b) => a.periodIdx - b.periodIdx);
+      const periods = byPeriod.map(s => s.periodIdx);
+      
+      const present = new Set(periods);
+      for (let p = periods[0] + 1; p < periods[periods.length - 1]; p++) {
+        if (!present.has(p)) {
+          conflicts.push({ kind: "gap", level: "soft", slotIds: [], message: `Teacher ${group[0].teacherCode} has a free gap on this day.` });
+          break;
+        }
+      }
+      
+      let run = 1;
+      for (let i = 1; i < periods.length; i++) {
+        if (periods[i] === periods[i - 1] + 1) run++;
+        else {
+          if (run > MAX_CONSECUTIVE_TEACHING) {
+            conflicts.push({ kind: "consecutive", level: "soft", slotIds: byPeriod.slice(i - run, i).map(s => s.id), message: `Teacher ${group[0].teacherCode} teaches ${run} consecutive periods.` });
+          }
+          run = 1;
+        }
+      }
+      if (run > MAX_CONSECUTIVE_TEACHING) {
+        conflicts.push({ kind: "consecutive", level: "soft", slotIds: byPeriod.slice(periods.length - run).map(s => s.id), message: `Teacher ${group[0].teacherCode} teaches ${run} consecutive periods.` });
+      }
     }
   }
 
