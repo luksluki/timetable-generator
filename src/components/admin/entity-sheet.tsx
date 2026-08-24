@@ -184,7 +184,13 @@ function FieldRenderer({
           onValueChange={(v) => form.setValue(def.name, v)}
         >
           <SelectTrigger id={def.name}>
-            <SelectValue placeholder={String(t("common.selectPlaceholder"))} />
+            <SelectValue placeholder={String(t("common.selectPlaceholder"))}>
+              {value === "" && def.type === "nullable-select"
+                ? String(t("common.none"))
+                : (value as string)
+                ? def.options.find((o) => o.value === (value as string))?.label || (value as string)
+                : undefined}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {def.type === "nullable-select" && <SelectItem value="">{String(t("common.none"))}</SelectItem>}

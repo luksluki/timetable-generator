@@ -152,7 +152,9 @@ export function SettingsManager({ initial }: Props) {
                 onValueChange={(v) => setConfig((c) => ({ ...c, semester: v || "Ganjil" }))}
               >
                 <SelectTrigger className="w-[200px]">
-                  <SelectValue />
+                  <SelectValue>
+                    {config.semester === "Ganjil" ? "Ganjil (Odd)" : "Genap (Even)"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Ganjil">Ganjil (Odd)</SelectItem>
@@ -264,7 +266,9 @@ export function SettingsManager({ initial }: Props) {
                     onValueChange={(v) => v && updateBreak(b.id, "afterIndex", v)}
                   >
                     <SelectTrigger className="h-8 w-[90px]">
-                      <SelectValue />
+                      <SelectValue>
+                        {String(b.afterIndex) ? `JP ${Number(b.afterIndex) + 1}` : ""}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {config.periods.map((p) => (

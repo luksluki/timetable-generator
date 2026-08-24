@@ -70,7 +70,9 @@ export function LocaleSwitcher() {
     <Select value={locale} onValueChange={(v) => setLocale(v as Locale)}>
       <SelectTrigger className="h-8 w-[88px] gap-1 text-xs" aria-label="Language">
         <Globe className="h-3.5 w-3.5" />
-        <SelectValue />
+        <SelectValue>
+          {locale === "id" ? "Bahasa Indonesia" : "English"}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="id">Bahasa Indonesia</SelectItem>

@@ -183,7 +183,11 @@ export function ScheduleBoard({ initialData, config }: Props) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Select value={String(timeout)} onValueChange={(v) => v && setTimeoutSec(Number(v))}>
-            <SelectTrigger className="w-[90px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-[90px]">
+              <SelectValue>
+                {TIMEOUTS.find(t => t.value === timeout)?.label ?? timeout}
+              </SelectValue>
+            </SelectTrigger>
             <SelectContent>
               {TIMEOUTS.map((tt) => (
                 <SelectItem key={tt.value} value={String(tt.value)}>{tt.label}</SelectItem>
@@ -191,7 +195,11 @@ export function ScheduleBoard({ initialData, config }: Props) {
             </SelectContent>
           </Select>
           <Select value={piketRule} onValueChange={(v) => setPiketRule(v as PiketRule)}>
-            <SelectTrigger className="w-[170px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-[170px]">
+              <SelectValue>
+                {piketRule === "capOver30" ? s("schedule.piketCap") : s("schedule.piketBlock")}
+              </SelectValue>
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="capOver30">{s("schedule.piketCap")}</SelectItem>
               <SelectItem value="blockUnder33">{s("schedule.piketBlock")}</SelectItem>
@@ -220,7 +228,11 @@ export function ScheduleBoard({ initialData, config }: Props) {
           </TabsList>
         </Tabs>
         <Select value={effectiveId} onValueChange={(v) => v && setSelection(v)}>
-          <SelectTrigger className="w-[260px]"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-[260px]">
+            <SelectValue>
+              {resources.find(r => r.id === effectiveId)?.label ?? ""}
+            </SelectValue>
+          </SelectTrigger>
           <SelectContent>
             {resources.map((r) => (
               <SelectItem key={r.id} value={r.id}>{r.label}</SelectItem>
