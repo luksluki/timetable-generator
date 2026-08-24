@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { allocationSchema } from "@/lib/validators";
-import { REQUIRED_WEEKLY_JP } from "@/lib/schedule-config";
+import { getScheduleConfig } from "@/lib/schedule-time-server";
+import { getTotalWeeklyJp } from "@/lib/schedule-time";
 
 function revalidateAll() {
   revalidatePath("/admin/allocations");
@@ -29,10 +30,12 @@ export async function upsertAllocation(input: unknown, id?: string) {
       : null;
     const excludeId = current?.classGroupId === data.classGroupId ? id : undefined;
     const total = (await classTotalJp(data.classGroupId, excludeId)) + data.weeklyHours;
-    if (total > REQUIRED_WEEKLY_JP) {
+    const cfg = await getScheduleConfig();
+    const requiredWeeklyJp = getTotalWeeklyJp(cfg);
+    if (total > requiredWeeklyJp) {
       return {
         ok: false as const,
-        error: `Class would total ${total} JP (max ${REQUIRED_WEEKLY_JP}).`,
+        error: `Class would total ${total} JP (max ${requiredWeeklyJp}).`,
       };
     }
 

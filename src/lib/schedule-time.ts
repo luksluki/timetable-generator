@@ -13,6 +13,7 @@ export type ScheduleConfigData = {
   breaks: BreakDef[];
   academicYear: string;
   semester: string;
+  activePeriodsPerDay: number[];
 };
 
 export type TimelineEntry =
@@ -42,6 +43,7 @@ export function defaultConfig(): ScheduleConfigData {
     breaks: DEFAULT_BREAKS.map((b) => ({ ...b })),
     academicYear: "2026-2027",
     semester: "Ganjil",
+    activePeriodsPerDay: [9, 9, 9, 9, 9],
   };
 }
 
@@ -72,6 +74,7 @@ export function normalizeConfig(
   breaksRaw: unknown,
   academicYearRaw?: unknown,
   semesterRaw?: unknown,
+  activePeriodsRaw?: unknown,
 ): ScheduleConfigData {
   const periods = (Array.isArray(periodsRaw) ? periodsRaw : [])
     .map((p) => asPeriod(p as Record<string, unknown>))
@@ -82,7 +85,14 @@ export function normalizeConfig(
     .filter((b): b is BreakDef => b !== null);
   const academicYear = typeof academicYearRaw === "string" && academicYearRaw.trim() ? academicYearRaw.trim() : "2026-2027";
   const semester = typeof semesterRaw === "string" && semesterRaw.trim() ? semesterRaw.trim() : "Ganjil";
-  return { periods, breaks, academicYear, semester };
+  const activePeriodsPerDay = Array.isArray(activePeriodsRaw)
+    ? activePeriodsRaw.map((v) => Number(v) || 9)
+    : [9, 9, 9, 9, 9];
+  return { periods, breaks, academicYear, semester, activePeriodsPerDay };
+}
+
+export function getTotalWeeklyJp(cfg: ScheduleConfigData): number {
+  return cfg.activePeriodsPerDay.reduce((a, b) => a + b, 0);
 }
 
 /** Merge periods + breaks into an ordered day timeline. */

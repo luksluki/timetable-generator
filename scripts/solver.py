@@ -61,6 +61,7 @@ def allowed_day_tuples(num_chunks: int, allowed_days: list[int]) -> list[list[in
 def solve(data: dict) -> dict:
     D = int(data["daysPerWeek"])
     P = int(data["periodsPerDay"])
+    active_periods = [int(x) for x in data.get("activePeriodsPerDay", [P] * D)]
     TOTAL = D * P
     MAX_CONS = int(data.get("maxConsecutiveTeaching", 3))
     morning = list(data.get("morningPeriods", [0, 1, 2]))
@@ -170,6 +171,16 @@ def solve(data: dict) -> dict:
         else:
             # single chunk: day already restricted to allowed days by domain
             pass
+
+    # ------------------------------------------------------------------
+    # Active Periods per Day limit
+    # ------------------------------------------------------------------
+    for b in blocks:
+        for d in b["allowed_days"]:
+            bd = model.NewBoolVar(f"act_d_{b['idx']}_{b['ci']}_{d}")
+            model.Add(b["day"] == d).OnlyEnforceIf(bd)
+            model.Add(b["day"] != d).OnlyEnforceIf(bd.Not())
+            model.Add(b["end"] <= active_periods[d]).OnlyEnforceIf(bd)
 
     # ------------------------------------------------------------------
     # No double-booking: class, teacher, shared labs

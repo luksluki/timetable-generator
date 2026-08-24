@@ -13,7 +13,10 @@ export const DAYS_PER_WEEK = 5;
  */
 export const PERIODS_PER_DAY = 9;
 
-/** Required weekly lesson allocation (JP) per class group. */
+/** 
+ * Required weekly lesson allocation (JP) per class group. 
+ * @deprecated Use `getTotalWeeklyJp(config)` from `schedule-time.ts` instead.
+ */
 export const REQUIRED_WEEKLY_JP = 42;
 
 /** Consecutive teaching periods allowed before a break is required (soft). */

@@ -158,6 +158,8 @@ model ScheduleConfig {
   periods   Json
   /// [{ id, afterIndex, start, end, label }, ...]
   breaks    Json
+  /// The number of active teaching periods for each day (index 0=Mon..4=Fri)
+  activePeriodsPerDay Int[] @default([9, 9, 9, 9, 9])
   academicYear String @default("2026-2027")
   semester     String @default("Ganjil")
   updatedAt DateTime @updatedAt

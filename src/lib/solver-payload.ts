@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getScheduleConfig } from "@/lib/schedule-time-server";
 import {
   DAYS_PER_WEEK,
   MAX_CONSECUTIVE_TEACHING,
@@ -21,7 +22,7 @@ export async function buildSolverPayload(opts?: {
   timeoutSeconds?: number;
   piketRule?: "capOver30" | "blockUnder33";
 }) {
-  const [teachers, classes, subjects, allocations, piket, rooms] =
+  const [teachers, classes, subjects, allocations, piket, rooms, config] =
     await Promise.all([
       prisma.teacher.findMany(),
       prisma.classGroup.findMany({ orderBy: { name: "asc" } }),
@@ -29,6 +30,7 @@ export async function buildSolverPayload(opts?: {
       prisma.teachingAllocation.findMany(),
       prisma.teacherPiket.findMany(),
       prisma.room.findMany(),
+      getScheduleConfig(),
     ]);
 
   // Weekly load per teacher (sum of allocation weeklyHours).
@@ -55,7 +57,8 @@ export async function buildSolverPayload(opts?: {
 
   return {
     daysPerWeek: DAYS_PER_WEEK,
-    periodsPerDay: PERIODS_PER_DAY,
+    periodsPerDay: config.periods.length,
+    activePeriodsPerDay: config.activePeriodsPerDay,
     maxConsecutiveTeaching: MAX_CONSECUTIVE_TEACHING,
     morningPeriods: MORNING_PERIOD_INDICES,
     softWeights: SOFT_WEIGHTS,

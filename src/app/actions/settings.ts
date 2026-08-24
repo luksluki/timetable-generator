@@ -19,9 +19,10 @@ export async function saveScheduleConfig(input: {
   breaks: unknown;
   academicYear: string;
   semester: string;
+  activePeriodsPerDay?: number[];
 }) {
   try {
-    const cfg = normalizeConfig(input.periods, input.breaks, input.academicYear, input.semester);
+    const cfg = normalizeConfig(input.periods, input.breaks, input.academicYear, input.semester, input.activePeriodsPerDay);
     await prisma.scheduleConfig.upsert({
       where: { id: 1 },
       create: {
@@ -30,12 +31,14 @@ export async function saveScheduleConfig(input: {
         breaks: cfg.breaks as object,
         academicYear: cfg.academicYear,
         semester: cfg.semester,
+        activePeriodsPerDay: cfg.activePeriodsPerDay,
       },
       update: {
         periods: cfg.periods as object,
         breaks: cfg.breaks as object,
         academicYear: cfg.academicYear,
         semester: cfg.semester,
+        activePeriodsPerDay: cfg.activePeriodsPerDay,
       },
     });
     revalidateAll();
@@ -54,12 +57,14 @@ export async function resetScheduleConfig() {
       breaks: DEFAULT_BREAKS as object,
       academicYear: "2026-2027",
       semester: "Ganjil",
+      activePeriodsPerDay: [9, 9, 9, 9, 9],
     },
     update: {
       periods: DEFAULT_PERIODS as object,
       breaks: DEFAULT_BREAKS as object,
       academicYear: "2026-2027",
       semester: "Ganjil",
+      activePeriodsPerDay: [9, 9, 9, 9, 9],
     },
   });
   revalidateAll();

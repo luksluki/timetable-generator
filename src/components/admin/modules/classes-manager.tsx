@@ -12,7 +12,6 @@ import { RowActions } from "@/components/admin/row-actions";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { upsertClassGroup, deleteClassGroup } from "@/app/actions/classes";
 import { upsertSubject, deleteSubject } from "@/app/actions/subjects";
-import { REQUIRED_WEEKLY_JP } from "@/lib/schedule-config";
 import { useT } from "@/components/i18n/locale-provider";
 
 type ClassRow = { id: string; name: string; grade: number; totalJp: number };
@@ -24,9 +23,11 @@ type SubjectRow = {
 export function ClassesSubjectsManager({
   classes,
   subjects,
+  requiredWeeklyJp,
 }: {
   classes: ClassRow[];
   subjects: SubjectRow[];
+  requiredWeeklyJp: number;
 }) {
   const router = useRouter();
   const { t } = useT();
@@ -64,8 +65,8 @@ export function ClassesSubjectsManager({
     {
       key: "jp", header: s("admin.classes.jp"), sortValue: (x) => x.totalJp,
       render: (x) => (
-        <Badge variant={x.totalJp === REQUIRED_WEEKLY_JP ? "secondary" : "destructive"}>
-          {x.totalJp} / {REQUIRED_WEEKLY_JP}
+        <Badge variant={x.totalJp === requiredWeeklyJp ? "secondary" : "destructive"}>
+          {x.totalJp} / {requiredWeeklyJp}
         </Badge>
       ),
     },

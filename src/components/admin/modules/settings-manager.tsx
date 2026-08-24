@@ -16,9 +16,11 @@ import {
 } from "@/components/ui/select";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { useT } from "@/components/i18n/locale-provider";
+import { DAY_NAMES_ID } from "@/lib/schedule-config";
 import {
   buildTimeline,
   ensureConfigRows,
+  getTotalWeeklyJp,
   type ScheduleConfigData,
   type PeriodDef,
   type BreakDef,
@@ -90,6 +92,7 @@ export function SettingsManager({ initial }: Props) {
         breaks: config.breaks,
         academicYear: config.academicYear,
         semester: config.semester,
+        activePeriodsPerDay: config.activePeriodsPerDay,
       });
       if (res.ok) {
         toast.success(String(t("common.saved")));
@@ -156,6 +159,37 @@ export function SettingsManager({ initial }: Props) {
                   <SelectItem value="Genap">Genap (Even)</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Periods Per Day */}
+        <div className="rounded-md border lg:col-span-2">
+          <div className="border-b px-3 py-2 text-sm font-semibold">Total JP / Hari</div>
+          <div className="flex flex-wrap gap-4 p-4">
+            {DAY_NAMES_ID.map((dayName, idx) => (
+              <div key={idx} className="space-y-1.5 flex flex-col">
+                <Label className="text-xs text-muted-foreground">{dayName}</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={20}
+                  className="w-[80px]"
+                  value={config.activePeriodsPerDay[idx]}
+                  onChange={(e) => {
+                    const v = parseInt(e.target.value) || 0;
+                    setConfig((c) => {
+                      const newArr = [...c.activePeriodsPerDay];
+                      newArr[idx] = v;
+                      return { ...c, activePeriodsPerDay: newArr };
+                    });
+                  }}
+                />
+              </div>
+            ))}
+            <div className="ml-auto flex flex-col justify-end">
+              <span className="text-xs text-muted-foreground">Total Mingguan</span>
+              <span className="text-lg font-bold">{getTotalWeeklyJp(config)} JP</span>
             </div>
           </div>
         </div>

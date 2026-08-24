@@ -9,5 +9,5 @@ import {
 export async function getScheduleConfig(): Promise<ScheduleConfigData> {
   const row = await prisma.scheduleConfig.findUnique({ where: { id: 1 } });
   if (!row) return defaultConfig();
-  return normalizeConfig(row.periods, row.breaks, row.academicYear, row.semester);
+  return normalizeConfig(row.periods, row.breaks, row.academicYear, row.semester, row.activePeriodsPerDay);
 }

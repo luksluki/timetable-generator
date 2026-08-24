@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import {
-  PERIODS_PER_DAY,
   DAYS_PER_WEEK,
-  REQUIRED_WEEKLY_JP,
 } from "@/lib/schedule-config";
+import { getScheduleConfig } from "@/lib/schedule-time-server";
+import { getTotalWeeklyJp } from "@/lib/schedule-time";
 import { getT } from "@/lib/i18n/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const { t, ts } = await getT();
-  const [teachers, classes, subjects, rooms, allocations, slots, piket] =
+  const [teachers, classes, subjects, rooms, allocations, slots, piket, config] =
     await Promise.all([
       prisma.teacher.count(),
       prisma.classGroup.count(),
@@ -23,7 +23,11 @@ export default async function HomePage() {
       prisma.teachingAllocation.count(),
       prisma.scheduleSlot.count(),
       prisma.teacherPiket.count(),
+      getScheduleConfig(),
     ]);
+
+  const requiredWeeklyJp = getTotalWeeklyJp(config);
+  const maxPeriodsPerDay = Math.max(...config.activePeriodsPerDay);
 
   const statKeys: { key: string; icon: typeof Users }[] = [
     { key: "home.stats.teachers", icon: Users },
@@ -83,7 +87,7 @@ export default async function HomePage() {
               ? (t("home.statusHas") as (n: number) => string)(slots)
               : ts("home.statusNone")}
             <p className="mt-2">
-              {DAYS_PER_WEEK} × {PERIODS_PER_DAY} · {REQUIRED_WEEKLY_JP} JP/minggu.
+              {DAYS_PER_WEEK} × (≤{maxPeriodsPerDay}) · {requiredWeeklyJp} JP/minggu.
             </p>
           </CardContent>
         </Card>

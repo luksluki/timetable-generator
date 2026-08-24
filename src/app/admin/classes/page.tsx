@@ -1,16 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { ClassesSubjectsManager } from "@/components/admin/modules/classes-manager";
+import { getScheduleConfig } from "@/lib/schedule-time-server";
+import { getTotalWeeklyJp } from "@/lib/schedule-time";
 
 export const dynamic = "force-dynamic";
 
 export default async function ClassesSubjectsPage() {
-  const [classes, subjects] = await Promise.all([
+  const [classes, subjects, config] = await Promise.all([
     prisma.classGroup.findMany({
       orderBy: { name: "asc" },
       include: { allocations: { select: { weeklyHours: true } } },
     }),
     prisma.subject.findMany({ orderBy: { name: "asc" } }),
+    getScheduleConfig(),
   ]);
+
+  const requiredWeeklyJp = getTotalWeeklyJp(config);
 
   const classRows = classes.map((c) => ({
     id: c.id,
@@ -29,6 +34,6 @@ export default async function ClassesSubjectsPage() {
   }));
 
   return (
-    <ClassesSubjectsManager classes={classRows} subjects={subjectRows} />
+    <ClassesSubjectsManager classes={classRows} subjects={subjectRows} requiredWeeklyJp={requiredWeeklyJp} />
   );
 }
